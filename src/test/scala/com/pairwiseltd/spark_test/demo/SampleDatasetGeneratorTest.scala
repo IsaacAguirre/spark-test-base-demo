@@ -1,4 +1,4 @@
-package com.pairwiseltd.spark.test.demo
+package com.pairwiseltd.spark_test.demo
 
 import com.holdenkarau.spark.testing.{DatasetGenerator, DatasetSuiteBase}
 import org.apache.spark.sql.Dataset
@@ -8,8 +8,8 @@ import org.scalatest.prop.Checkers
 import org.scalacheck.Prop.forAll
 
 
-class SampleDatasetGeneratorTest extends FunSuite with DatasetSuiteBase with Checkers {
-  test("test generating Datasets[String]") {
+class SampleDatasetGeneratorTest extends FunSuite with SampleDatasetJob  with DatasetSuiteBase with Checkers {
+  test(s"test all the resulting people should be under $MAXIMUM_AGE years old") {
     import sqlContext.implicits._
 
     val personGen: Gen[Dataset[Person]] =
@@ -23,13 +23,10 @@ class SampleDatasetGeneratorTest extends FunSuite with DatasetSuiteBase with Che
       }
     val property =
       forAll(personGen) {
-        dataset => dataset.map(_.age).count() == dataset.count()
+        dataset => transform(dataset).collect.forall(p => p.age <= MAXIMUM_AGE && p.age >= 0)
       }
 
-    property.check
+    check(property)
   }
 
 }
-
-
-case class Person(name: String, age: Byte /* a person not a vampire*/)
