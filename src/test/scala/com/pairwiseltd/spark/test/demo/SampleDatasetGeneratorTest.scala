@@ -21,7 +21,6 @@ class SampleDatasetGeneratorTest extends FunSuite with DatasetSuiteBase with Che
 
         generator
       }
-
     val property =
       forAll(personGen) {
         dataset => dataset.map(_.age).count() == dataset.count()
